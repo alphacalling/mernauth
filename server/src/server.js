@@ -25,6 +25,9 @@ app.use(
 );
 
 // Routes
+app.use("/", (req, res) => {
+  res.send("Server is running");
+});
 app.use("/api/users", userRoutes);
 
 // Error handling middleware
