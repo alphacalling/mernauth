@@ -25,24 +25,28 @@ app.use(
 );
 
 // Routes
-app.use("/", (req, res) => {
+app.use("/health", (req, res) => {
   res.send("Server is running");
 });
 app.use("/api/users", userRoutes);
 
-// Error handling middleware
-app.use(notFound);
-app.use(errorHandler);
-
 // Serve frontend in production
 if (NODE_ENV === "production") {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
-  app.use(express.static(path.join(__dirname, "../dist")));
+  app.use(express.static(path.join(__dirname, "../../client/dist")));
 
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../dist/index.html"));
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(__dirname, "../../client/dist", "index.html"))
+  );
+} else {
+  app.get("/", (req, res) => {
+    res.send("API is running....");
   });
 }
+
+// Error handling middleware must be last
+app.use(notFound);
+app.use(errorHandler);
 
 // Start server
 app.listen(PORT, (err) => {

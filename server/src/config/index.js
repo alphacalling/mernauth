@@ -8,9 +8,11 @@ if (NODE_ENV === "local") {
   DATABASE_URL = process.env.MONGODB_URL_LOCAL;
 } else if (NODE_ENV === "development") {
   DATABASE_URL = process.env.MONGODB_URL_DEV;
+} else if (NODE_ENV === "production") {
+  DATABASE_URL = process.env.MONGODB_URL_PROD;
 } else {
   throw new Error(
-    `Unknown NODE_ENV ${NODE_ENV}. Expected "local" or "development"`
+    `Unknown NODE_ENV ${NODE_ENV}. Expected "local", "development", or "production"`
   );
 }
 

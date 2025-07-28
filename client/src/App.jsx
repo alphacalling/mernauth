@@ -10,7 +10,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import axios from 'axios';
 
 // Set default base URL for API requests
-axios.defaults.baseURL = 'http://localhost:5000/api';
+axios.defaults.baseURL = '/api';
 axios.defaults.withCredentials = true;
 
 // Protected route component

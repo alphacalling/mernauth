@@ -5,7 +5,7 @@ import {
   useCallback,
   useEffect,
 } from "react";
-import axios from "axios";
+import api from "../api/api";
 
 const AuthContext = createContext();
 
@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
 
-      const response = await axios.post("/users", {
+      const response = await api.post("/users", {
         name,
         email,
         password,
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
 
-      const response = await axios.post("/users/login", {
+      const response = await api.post("/users/login", {
         email,
         password,
       });
@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       setLoading(true);
-      await axios.post("/users/logout");
+      await api.post("/users/logout");
       setUser(null);
     } catch (err) {
       setError(
@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
 
-      const response = await axios.get("/users/profile");
+      const response = await api.get("/users/profile");
       setUser(response.data);
       return response.data;
     } catch (err) {
@@ -101,7 +101,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
 
-      const response = await axios.put("/users/profile", userData);
+      const response = await api.put("/users/profile", userData);
       setUser(response.data);
       return true;
     } catch (err) {
@@ -119,7 +119,7 @@ export const AuthProvider = ({ children }) => {
   const checkAuth = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/users/profile");
+      const response = await api.get("/users/profile");
       setUser(response.data);
     } catch (err) {
       setUser(null);
@@ -127,9 +127,9 @@ export const AuthProvider = ({ children }) => {
       // Try to refresh token if 401 error
       if (err.response?.status === 401) {
         try {
-          await axios.post("/users/refresh");
+          await api.post("/users/refresh");
           // If refresh successful, try to get profile again
-          const response = await axios.get("/users/profile");
+          const response = await api.get("/users/profile");
           setUser(response.data);
         } catch (refreshErr) {
           // If refresh fails, user is truly logged out
@@ -143,7 +143,7 @@ export const AuthProvider = ({ children }) => {
 
   // Create axios response interceptor to handle token expiration
   useEffect(() => {
-    const responseInterceptor = axios.interceptors.response.use(
+    const responseInterceptor = api.interceptors.response.use(
       (response) => response,
       async (error) => {
         const originalRequest = error.config;
@@ -158,9 +158,9 @@ export const AuthProvider = ({ children }) => {
 
           try {
             // Try to refresh the token
-            await axios.post("/users/refresh");
+            await api.post("/users/refresh");
             // Retry the original request
-            return axios(originalRequest);
+            return api(originalRequest);
           } catch (refreshError) {
             // If refresh fails, redirect to login
             setUser(null);
@@ -173,7 +173,7 @@ export const AuthProvider = ({ children }) => {
     );
 
     return () => {
-      axios.interceptors.response.eject(responseInterceptor);
+      api.interceptors.response.eject(responseInterceptor);
     };
   }, []);
 
